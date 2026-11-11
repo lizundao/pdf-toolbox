@@ -1,0 +1,24 @@
+{
+  "name": "pdf-compress",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "release": "npm run tauri build",
+    "release:portable": "npm run release && npm run release:zip",
+    "release:zip": "powershell -NoProfile -Command \"$root='release/PDF工具箱-1.0.0-便携版'; New-Item -ItemType Directory -Force -Path $root | Out-Null; Copy-Item src-tauri/target/release/pdf-compress.exe $root; Copy-Item docs/用户手册.md $root; Compress-Archive -Path $root -DestinationPath release/PDF工具箱-1.0.0-便携版.zip -Force; Get-Item release/PDF工具箱-1.0.0-便携版.zip, $root/pdf-compress.exe | Select-Object Name,Length,LastWriteTime\""
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.10.1",
+    "@tauri-apps/plugin-dialog": "2.6.0",
+    "pdfjs-dist": "^4.10.38"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "vite": "^6"
+  }
+}

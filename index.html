@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF 工具箱</title>
+    <link rel="icon" href="/logo.png" type="image/png" />
+    <!-- 外部经典脚本：严格 CSP 下仍可同步执行，避免主题闪烁 -->
+    <script src="/theme-init.js"></script>
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+  <body>
+    <div class="app-frame">
+      <header class="titlebar" data-tauri-drag-region>
+        <img src="/logo.png" alt="" class="titlebar-logo" width="18" height="18" data-tauri-drag-region />
+        <span class="titlebar-name" data-tauri-drag-region>PDF 工具箱</span>
+        <nav class="menubar" id="menubar">
+          <div class="menu-root">
+            <button type="button" class="menu-trigger" aria-haspopup="true">工具</button>
+            <div class="menu-popup" hidden>
+              <button type="button" data-view="home">首页</button>
+              <button type="button" data-view="compress">压缩</button>
+              <button type="button" data-view="scan">扫描增强</button>
+              <button type="button" data-view="pages">页面工具</button>
+              <button type="button" data-view="convert">格式转换</button>
+              <button type="button" data-view="watermark">水印版式</button>
+              <button type="button" data-view="security">安全隐私</button>
+              <button type="button" data-view="redact">脱敏涂黑</button>
+              <button type="button" data-view="info">预览信息</button>
+            </div>
+          </div>
+          <div class="menu-root">
+            <button type="button" class="menu-trigger" aria-haspopup="true">帮助</button>
+            <div class="menu-popup" hidden>
+              <button type="button" data-view="about">关于</button>
+              <button type="button" data-view="license">许可证</button>
+            </div>
+          </div>
+          <div class="menu-root">
+            <button type="button" class="menu-trigger" aria-haspopup="true">文件</button>
+            <div class="menu-popup" hidden>
+              <button type="button" id="menuQuit">退出</button>
+            </div>
+          </div>
+        </nav>
+        <div class="titlebar-drag" data-tauri-drag-region aria-hidden="true"></div>
+        <div class="window-controls">
+          <button type="button" class="win-btn" id="winMinimize" title="最小化" aria-label="最小化">─</button>
+          <button type="button" class="win-btn" id="winMaximize" title="最大化" aria-label="最大化">□</button>
+          <button type="button" class="win-btn win-btn-close" id="winClose" title="关闭" aria-label="关闭">✕</button>
+        </div>
+      </header>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="/logo.png" alt="" class="sidebar-logo" width="32" height="32" />
+          <div class="sidebar-brand-text">
+            <h1>PDF 工具箱</h1>
+          </div>
+          <button type="button" class="theme-toggle sidebar-theme" id="themeToggle" title="切换主题" aria-label="切换主题">
+            <span class="theme-toggle-icon">☀</span>
+          </button>
+        </div>
+        <nav>
+          <div class="nav-group-label">工具</div>
+          <button type="button" class="nav-item active" data-view="home">
+            <span class="nav-icon">⌂</span> 首页
+          </button>
+          <button type="button" class="nav-item" data-view="compress">
+            <span class="nav-icon">⊟</span> 压缩
+          </button>
+          <button type="button" class="nav-item" data-view="scan">
+            <span class="nav-icon">🔍</span> 扫描增强
+          </button>
+          <button type="button" class="nav-item" data-view="pages">
+            <span class="nav-icon">📄</span> 页面工具
+          </button>
+          <button type="button" class="nav-item" data-view="convert">
+            <span class="nav-icon">⇄</span> 格式转换
+          </button>
+          <button type="button" class="nav-item" data-view="watermark">
+            <span class="nav-icon">◎</span> 水印版式
+          </button>
+          <button type="button" class="nav-item" data-view="security">
+            <span class="nav-icon">🔒</span> 安全隐私
+          </button>
+          <button type="button" class="nav-item" data-view="redact">
+            <span class="nav-icon">▮</span> 脱敏涂黑
+          </button>
+          <button type="button" class="nav-item" data-view="info">
+            <span class="nav-icon">ℹ</span> 预览信息
+          </button>
+          <div class="nav-group-label">关于</div>
+          <button type="button" class="nav-item" data-view="about">
+            <span class="nav-icon">ⓘ</span> 关于
+          </button>
+          <button type="button" class="nav-item" data-view="license">
+            <span class="nav-icon">📄</span> 许可证
+          </button>
+        </nav>
+        <div class="sidebar-footer">v<span data-app-version>1.0.0</span> · 墨点 inkdot</div>
+      </aside>
+
+      <main class="main">
+        <!-- 首页 -->
+        <section class="view active" id="view-home">
+          <div class="view-header">
+            <h2>选择工具</h2>
+            <p>点击卡片、左侧导航或顶部菜单切换功能</p>
+          </div>
+          <div class="tool-grid">
+            <div class="tool-card" role="button" tabindex="0" data-goto="compress">
+              <div class="icon">⊟</div>
+              <h3>压缩</h3>
+              <p>减小 PDF 体积，支持批量</p>
+              <span class="badge">可用</span>
+            </div>
+            <div class="tool-card" role="button" tabindex="0" data-goto="pages">
+              <div class="icon">📄</div>
+              <h3>页面工具</h3>
+              <p>合并、拆分、重排、插入、裁剪等</p>
+              <span class="badge">可用</span>
+            </div>
+            <div class="tool-card" role="button" tabindex="0" data-goto="scan">
+              <div class="icon">🔍</div>
+              <h3>扫描增强</h3>
+              <p>图片重压缩、降分辨率、转灰度</p>
+              <span class="badge">可用</span>
+            </div>
+            <div class="tool-card" role="button" tabindex="0" data-goto="convert">
+              <div class="icon">⇄</div>
+              <h3>格式转换</h3>
+              <p>图片↔PDF、PDF↔文本、Office→PDF</p>
+              <span class="badge">可用</span>
+            </div>
+            <div class="tool-card" role="button" tabindex="0" data-goto="watermark">
+              <div class="icon">◎</div>
+              <h3>水印版式</h3>
+              <p>文字/图片水印、页眉页脚、页码</p>
+              <span class="badge">可用</span>
+            </div>
+            <div class="tool-card" role="button" tabindex="0" data-goto="info">
+              <div class="icon">ℹ</div>
+              <h3>预览信息</h3>
+              <p>文档预览、缩略图、元数据编辑</p>
+              <span class="badge">可用</span>
+            </div>
+            <div class="tool-card" role="button" tabindex="0" data-goto="security">
+              <div class="icon">🔒</div>
+              <h3>安全隐私</h3>
+              <p>加密、解密、清除元数据</p>
+              <span class="badge">可用</span>
+            </div>
+            <div class="tool-card" role="button" tabindex="0" data-goto="redact">
+              <div class="icon">▮</div>
+              <h3>脱敏涂黑</h3>
+              <p>框选敏感区域，输出涂黑 PDF</p>
+              <span class="badge">可用</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 压缩 -->
+        <section class="view" id="view-compress">
+          <div class="view-header">
+            <h2>PDF 压缩</h2>
+            <p>压缩 PDF 体积，不改变图片清晰度</p>
+          </div>
+
+          <div class="tabs">
+            <button type="button" class="tab active" data-compress-mode="single">单文件</button>
+            <button type="button" class="tab" data-compress-mode="batch">批量</button>
+          </div>
+
+          <section class="card drop-zone" id="compressDropZone">
+            <p class="drop-hint">拖放 PDF 到此处</p>
+            <p class="drop-sub">或点击下方按钮选择</p>
+          </section>
+
+          <div id="compressSingle">
+            <section class="card">
+              <label class="field">
+                <span>源文件</span>
+                <div class="input-row">
+                  <input type="text" id="compressSource" readonly placeholder="选择 PDF" />
+                  <button type="button" class="btn" id="compressPickSource">选择</button>
+                </div>
+              </label>
+              <label class="field">
+                <span>输出路径</span>
+                <div class="input-row">
+                  <input type="text" id="compressOutput" readonly placeholder="保存位置" />
+                  <button type="button" class="btn" id="compressPickOutput">保存</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <div id="compressBatch" hidden>
+            <section class="card">
+              <label class="field">
+                <span>源文件（<output id="compressFileCount">0</output> 个）</span>
+                <div class="input-row">
+                  <button type="button" class="btn" id="compressPickSources">选择多个</button>
+                  <button type="button" class="btn btn-secondary" id="compressClearSources">清空</button>
+                </div>
+                <ul class="file-list" id="compressFileList"></ul>
+              </label>
+              <label class="field">
+                <span>输出目录</span>
+                <div class="input-row">
+                  <input type="text" id="compressOutputDir" readonly placeholder="选择目录" />
+                  <button type="button" class="btn" id="compressPickOutputDir">选择</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <section class="card">
+            <label class="field">
+              <span>压缩强度 <output id="compressRatioVal">50</output>%</span>
+              <input type="range" id="compressRatio" min="1" max="100" value="50" />
+              <p class="hint">数值越高压缩越强，不影响图片质量</p>
+            </label>
+            <button type="button" class="btn btn-block" id="compressRun" disabled>开始压缩</button>
+          </section>
+
+          <section class="card result" id="compressResult" hidden>
+            <h3>结果</h3>
+            <ul id="compressResultList"></ul>
+          </section>
+          <section class="card error" id="compressError" hidden>
+            <h3>错误</h3>
+            <p id="compressErrorText"></p>
+          </section>
+        </section>
+
+        <!-- 扫描增强 -->
+        <section class="view" id="view-scan">
+          <div class="view-header">
+            <h2>扫描增强</h2>
+            <p>优化页面图片，适合扫描件与图片较多的 PDF</p>
+          </div>
+
+          <div class="tabs">
+            <button type="button" class="tab active" data-scan-mode="single">单文件</button>
+            <button type="button" class="tab" data-scan-mode="batch">批量</button>
+          </div>
+
+          <section class="card drop-zone" id="scanDropZone">
+            <p class="drop-hint">拖放 PDF 到此处</p>
+          </section>
+
+          <div id="scanSingle">
+            <section class="card">
+              <label class="field">
+                <span>源文件</span>
+                <div class="input-row">
+                  <input type="text" id="scanSource" readonly placeholder="选择 PDF" />
+                  <button type="button" class="btn" id="scanPickSource">选择</button>
+                </div>
+              </label>
+              <label class="field">
+                <span>输出路径</span>
+                <div class="input-row">
+                  <input type="text" id="scanOutput" readonly placeholder="保存位置" />
+                  <button type="button" class="btn" id="scanPickOutput">保存</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <div id="scanBatch" hidden>
+            <section class="card">
+              <label class="field">
+                <span>源文件（<output id="scanFileCount">0</output> 个）</span>
+                <div class="input-row">
+                  <button type="button" class="btn" id="scanPickSources">选择多个</button>
+                  <button type="button" class="btn btn-secondary" id="scanClearSources">清空</button>
+                </div>
+                <ul class="file-list" id="scanFileList"></ul>
+              </label>
+              <label class="field">
+                <span>输出目录</span>
+                <div class="input-row">
+                  <input type="text" id="scanOutputDir" readonly placeholder="选择目录" />
+                  <button type="button" class="btn" id="scanPickOutputDir">选择</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <section class="card">
+            <label class="field">
+              <span>JPEG 质量 <output id="scanQualityVal">75</output>%</span>
+              <input type="range" id="scanQuality" min="10" max="100" value="75" />
+            </label>
+            <label class="field">
+              <span>最大边长（像素，0=不缩放）</span>
+              <input type="number" id="scanMaxDim" min="0" value="2048" />
+              <p class="hint">缩小超大扫描图可显著减小体积</p>
+            </label>
+            <label class="field checkbox-field">
+              <input type="checkbox" id="scanGrayscale" />
+              <span>转为灰度（黑白扫描件推荐）</span>
+            </label>
+            <button type="button" class="btn btn-block" id="scanRun" disabled>开始处理</button>
+          </section>
+
+          <section class="card result" id="scanResult" hidden>
+            <h3>结果</h3>
+            <ul id="scanResultList"></ul>
+          </section>
+          <section class="card error" id="scanError" hidden>
+            <h3>错误</h3>
+            <p id="scanErrorText"></p>
+          </section>
+        </section>
+
+        <!-- 格式转换 -->
+        <section class="view" id="view-convert">
+          <div class="view-header">
+            <h2>格式转换</h2>
+            <p>图片合成 PDF、PDF 转图片/文本、Office 转 PDF（Windows）</p>
+          </div>
+
+          <div class="tabs">
+            <button type="button" class="tab active" data-convert-mode="img2pdf">图片 → PDF</button>
+            <button type="button" class="tab" data-convert-mode="pdf2img">PDF → 图片</button>
+            <button type="button" class="tab" data-convert-mode="pdf2text">PDF → 文本</button>
+            <button type="button" class="tab" data-convert-mode="text2pdf">文本 → PDF</button>
+            <button type="button" class="tab" data-convert-mode="office2pdf">Office → PDF</button>
+          </div>
+
+          <section class="card drop-zone" id="convertDropZone">
+            <p class="drop-hint">拖放文件到此处</p>
+            <p class="drop-sub" id="convertDropSub">图片 / PDF，依当前模式自动识别</p>
+          </section>
+
+          <div id="convertImg2pdf">
+            <section class="card">
+              <label class="field">
+                <span>图片（<output id="convertImageCount">0</output> 张）</span>
+                <div class="input-row">
+                  <button type="button" class="btn" id="convertPickImages">选择图片</button>
+                  <button type="button" class="btn btn-secondary" id="convertClearImages">清空</button>
+                </div>
+                <ul class="file-list" id="convertImageList"></ul>
+              </label>
+              <label class="field">
+                <span>输出 PDF</span>
+                <div class="input-row">
+                  <input type="text" id="convertImgOutput" readonly placeholder="保存位置" />
+                  <button type="button" class="btn" id="convertPickImgOutput">保存</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <div id="convertPdf2img" hidden>
+            <div class="tabs sub-tabs">
+              <button type="button" class="tab active" data-pdf2img-mode="single">单文件</button>
+              <button type="button" class="tab" data-pdf2img-mode="batch">批量</button>
+            </div>
+            <div id="convertPdf2imgSingle">
+            <section class="card">
+              <label class="field">
+                <span>源 PDF</span>
+                <div class="input-row">
+                  <input type="text" id="convertPdf2imgSource" readonly placeholder="选择 PDF" />
+                  <button type="button" class="btn" id="convertPickPdf2imgSource">选择</button>
+                </div>
+              </label>
+              <label class="field">
+                <span>密码（加密 PDF）</span>
+                <input type="password" id="convertPdf2imgPassword" placeholder="未加密可留空" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>页码范围（留空=全部）</span>
+                <input type="text" id="convertPdf2imgRange" placeholder="如 1-5, 8" />
+              </label>
+              <label class="field">
+                <span>输出目录</span>
+                <div class="input-row">
+                  <input type="text" id="convertImgOutputDir" readonly placeholder="选择目录" />
+                  <button type="button" class="btn" id="convertPickImgOutputDir">选择</button>
+                </div>
+              </label>
+            </section>
+            </div>
+            <div id="convertPdf2imgBatch" hidden>
+              <section class="card">
+                <label class="field">
+                  <span>源 PDF（<output id="convertPdf2imgBatchCount">0</output> 个）</span>
+                  <div class="input-row">
+                    <button type="button" class="btn" id="convertPickPdf2imgBatch">选择多个</button>
+                    <button type="button" class="btn btn-secondary" id="convertClearPdf2imgBatch">清空</button>
+                  </div>
+                  <ul class="file-list" id="convertPdf2imgBatchList"></ul>
+                </label>
+                <label class="field">
+                  <span>密码（全部文件共用，加密 PDF）</span>
+                  <input type="password" id="convertPdf2imgBatchPassword" placeholder="未加密可留空" autocomplete="off" />
+                </label>
+                <label class="field">
+                  <span>页码范围（留空=全部，全部文件共用）</span>
+                  <input type="text" id="convertPdf2imgBatchRange" placeholder="如 1-5, 8" />
+                </label>
+                <label class="field">
+                  <span>输出目录</span>
+                  <div class="input-row">
+                    <input type="text" id="convertImgOutputDirBatch" readonly placeholder="选择目录" />
+                    <button type="button" class="btn" id="convertPickImgOutputDirBatch">选择</button>
+                  </div>
+                  <p class="hint">每个 PDF 的图片保存在以文件名命名的子目录中</p>
+                </label>
+              </section>
+            </div>
+            <section class="card">
+              <label class="field">
+                <span>图片格式</span>
+                <select id="convertImgFormat">
+                  <option value="png">PNG（无损）</option>
+                  <option value="jpeg">JPEG（体积更小）</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>清晰度</span>
+                <select id="convertImgScale">
+                  <option value="1">标准 (1x)</option>
+                  <option value="1.5">较高 (1.5x)</option>
+                  <option value="2" selected>高清 (2x)</option>
+                  <option value="3">超清 (3x)</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>JPEG 质量 <output id="convertImgQualityVal">85</output>%</span>
+                <input type="range" id="convertImgQuality" min="50" max="100" value="85" />
+                <p class="hint">仅 JPEG 格式生效；PNG 为无损导出</p>
+              </label>
+            </section>
+          </div>
+
+          <div id="convertPdf2text" hidden>
+            <section class="card">
+              <label class="field">
+                <span>源 PDF</span>
+                <div class="input-row">
+                  <input type="text" id="convertPdfSource" readonly placeholder="选择 PDF" />
+                  <button type="button" class="btn" id="convertPickPdfSource">选择</button>
+                </div>
+              </label>
+              <label class="field">
+                <span>页码范围（留空=全部）</span>
+                <input type="text" id="convertPageRange" placeholder="如 1-5, 8" />
+              </label>
+              <label class="field">
+                <span>输出文本</span>
+                <div class="input-row">
+                  <input type="text" id="convertTextOutput" readonly placeholder="保存 .txt" />
+                  <button type="button" class="btn" id="convertPickTextOutput">保存</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <div id="convertText2pdf" hidden>
+            <section class="card">
+              <label class="field">
+                <span>文本文件（可选）</span>
+                <div class="input-row">
+                  <input type="text" id="convertTextSource" readonly placeholder="选择 .txt，或下方直接输入" />
+                  <button type="button" class="btn" id="convertPickTextSource">选择</button>
+                </div>
+              </label>
+              <label class="field">
+                <span>或直接输入文本</span>
+                <textarea id="convertTextInput" rows="6" placeholder="输入要写入 PDF 的文字"></textarea>
+              </label>
+              <label class="field">
+                <span>输出 PDF</span>
+                <div class="input-row">
+                  <input type="text" id="convertTextPdfOutput" readonly placeholder="保存位置" />
+                  <button type="button" class="btn" id="convertPickTextPdfOutput">保存</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <div id="convertOffice2pdf" hidden>
+            <p class="info-bar warn" id="convertOfficeNotice">正在检测本机 Office…</p>
+            <div class="inline-progress" id="convertOfficeDetectProgress" hidden>
+              <div class="progress-track"><div class="progress-bar" id="convertOfficeDetectBar"></div></div>
+              <span class="progress-label" id="convertOfficeDetectLabel">0%</span>
+            </div>
+            <p class="info-bar" id="convertOfficeStatus" hidden></p>
+            <section class="card">
+              <label class="field">
+                <span>Office 文档</span>
+                <div class="input-row">
+                  <input type="text" id="convertOfficeSource" readonly placeholder="选择 Word / Excel / PowerPoint 文件" />
+                  <button type="button" class="btn" id="convertPickOfficeSource">选择</button>
+                </div>
+                <p class="hint">支持 .doc/.docx、.xls/.xlsx、.ppt/.pptx 等格式</p>
+              </label>
+              <label class="field">
+                <span>输出 PDF</span>
+                <div class="input-row">
+                  <input type="text" id="convertOfficeOutput" readonly placeholder="保存位置" />
+                  <button type="button" class="btn" id="convertPickOfficeOutput">保存</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <button type="button" class="btn btn-block" id="convertRun" disabled>开始转换</button>
+
+          <section class="card result" id="convertResult" hidden>
+            <h3>结果</h3>
+            <ul id="convertResultList"></ul>
+          </section>
+          <section class="card error" id="convertError" hidden>
+            <h3>错误</h3>
+            <p id="convertErrorText"></p>
+          </section>
+        </section>
+
+        <!-- 水印版式 -->
+        <section class="view" id="view-watermark">
+          <div class="view-header">
+            <h2>水印版式</h2>
+            <p>文字水印、图片 Logo 叠加、页眉页脚与页码</p>
+          </div>
+
+          <div class="tabs">
+            <button type="button" class="tab active" data-wm-mode="text">文字水印</button>
+            <button type="button" class="tab" data-wm-mode="image">图片水印</button>
+            <button type="button" class="tab" data-wm-mode="header">页眉页脚</button>
+          </div>
+
+          <section class="card drop-zone" id="wmDropZone">
+            <p class="drop-hint">拖放 PDF 到此处</p>
+            <p class="drop-sub">或点击下方按钮选择</p>
+          </section>
+
+          <section class="card">
+            <label class="field">
+              <span>源 PDF</span>
+              <div class="input-row">
+                <input type="text" id="wmSource" readonly placeholder="选择 PDF" />
+                <button type="button" class="btn" id="wmPickSource">选择</button>
+              </div>
+            </label>
+            <label class="field">
+              <span>输出 PDF</span>
+              <div class="input-row">
+                <input type="text" id="wmOutput" readonly placeholder="保存位置" />
+                <button type="button" class="btn" id="wmPickOutput">保存</button>
+              </div>
+            </label>
+            <label class="field">
+              <span>页码范围（留空=全部）</span>
+              <input type="text" id="wmPageRange" placeholder="如 1-5, 8" />
+            </label>
+          </section>
+
+          <div id="wmFontField" class="card">
+            <label class="field">
+              <span>字体</span>
+              <div class="input-row">
+                <select id="wmFontSelect" class="font-select">
+                  <option value="">加载中…</option>
+                </select>
+                <button type="button" class="btn" id="wmPickFont">浏览字体…</button>
+              </div>
+              <p class="hint">默认使用系统中文字体；也可选择本机 .ttf / .ttc / .otf 字体文件</p>
+            </label>
+          </div>
+
+          <div id="wmTextPanel">
+            <section class="card">
+              <label class="field">
+                <span>水印文字</span>
+                <input type="text" id="wmText" placeholder="如 机密、内部资料" />
+              </label>
+              <label class="field">
+                <span>字号 <output id="wmFontSizeVal">48</output> pt</span>
+                <input type="range" id="wmFontSize" min="16" max="96" value="48" />
+              </label>
+              <label class="field">
+                <span>透明度 <output id="wmOpacityVal">25</output>%</span>
+                <input type="range" id="wmOpacity" min="5" max="80" value="25" />
+              </label>
+              <label class="field">
+                <span>旋转角度（度）</span>
+                <input type="number" id="wmAngle" min="-180" max="180" value="45" />
+              </label>
+              <label class="field checkbox-field">
+                <input type="checkbox" id="wmTiled" checked />
+                <span>平铺水印</span>
+              </label>
+            </section>
+          </div>
+
+          <div id="wmImagePanel" hidden>
+            <section class="card">
+              <label class="field">
+                <span>水印图片</span>
+                <div class="input-row">
+                  <input type="text" id="wmImage" readonly placeholder="PNG / JPG" />
+                  <button type="button" class="btn" id="wmPickImage">选择</button>
+                </div>
+              </label>
+              <label class="field">
+                <span>相对页面宽度 <output id="wmImgScaleVal">30</output>%</span>
+                <input type="range" id="wmImgScale" min="10" max="80" value="30" />
+              </label>
+              <label class="field">
+                <span>透明度</span>
+                <input type="range" id="wmImgOpacity" min="10" max="100" value="50" />
+              </label>
+              <label class="field">
+                <span>位置</span>
+                <select id="wmImgPosition">
+                  <option value="center">居中</option>
+                  <option value="top-left">左上</option>
+                  <option value="top-right">右上</option>
+                  <option value="bottom-left">左下</option>
+                  <option value="bottom-right">右下</option>
+                </select>
+              </label>
+            </section>
+          </div>
+
+          <div id="wmHeaderPanel" hidden>
+            <section class="card">
+              <label class="field">
+                <span>页眉文字（可选）</span>
+                <input type="text" id="wmHeaderText" placeholder="如 公司名称" />
+              </label>
+              <label class="field">
+                <span>页脚模板</span>
+                <input type="text" id="wmFooterTemplate" value="{page} / {total}" placeholder="{page} / {total}" />
+                <p class="hint">可用占位符：{page} 当前页、{total} 总页数</p>
+              </label>
+              <label class="field checkbox-field">
+                <input type="checkbox" id="wmShowDate" checked />
+                <span>页脚右侧显示日期</span>
+              </label>
+            </section>
+          </div>
+
+          <button type="button" class="btn btn-block" id="wmRun" disabled>开始处理</button>
+
+          <section class="card result" id="wmResult" hidden>
+            <h3>结果</h3>
+            <ul id="wmResultList"></ul>
+          </section>
+          <section class="card error" id="wmError" hidden>
+            <h3>错误</h3>
+            <p id="wmErrorText"></p>
+          </section>
+        </section>
+
+        <!-- 安全隐私 -->
+        <section class="view" id="view-security">
+          <div class="view-header">
+            <h2>安全隐私</h2>
+            <p>密码保护、权限限制、清除文档元数据</p>
+          </div>
+
+          <div class="tabs">
+            <button type="button" class="tab active" data-sec-mode="encrypt">加密</button>
+            <button type="button" class="tab" data-sec-mode="decrypt">解密</button>
+            <button type="button" class="tab" data-sec-mode="meta">清除元数据</button>
+          </div>
+
+          <section class="card drop-zone" id="secDropZone">
+            <p class="drop-hint">拖放 PDF 到此处</p>
+            <p class="drop-sub">或点击下方按钮选择</p>
+          </section>
+
+          <section class="card">
+            <label class="field">
+              <span>源 PDF</span>
+              <div class="input-row">
+                <input type="text" id="secSource" readonly placeholder="选择 PDF" />
+                <button type="button" class="btn" id="secPickSource">选择</button>
+              </div>
+            </label>
+            <label class="field">
+              <span>输出 PDF</span>
+              <div class="input-row">
+                <input type="text" id="secOutput" readonly placeholder="保存位置" />
+                <button type="button" class="btn" id="secPickOutput">保存</button>
+              </div>
+            </label>
+          </section>
+
+          <div id="secEncryptPanel">
+            <section class="card">
+              <label class="field">
+                <span>打开密码（必填）</span>
+                <input type="password" id="secUserPassword" placeholder="用户打开文档时输入" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>权限密码（必填，且与打开密码不同）</span>
+                <input type="password" id="secOwnerPassword" placeholder="用于管控打印/复制，须不同于打开密码" autocomplete="off" />
+              </label>
+              <label class="field checkbox-field">
+                <input type="checkbox" id="secAllowPrint" checked />
+                <span>允许打印</span>
+              </label>
+              <label class="field checkbox-field">
+                <input type="checkbox" id="secAllowCopy" checked />
+                <span>允许复制内容</span>
+              </label>
+              <p class="hint">采用 AES-256（PDF 2.0）加密，元数据一并加密。权限密码必须与打开密码不同，否则打印/复制限制无法生效。不兼容 Acrobat 9 及以下等老旧阅读器。</p>
+            </section>
+          </div>
+
+          <div id="secDecryptPanel" hidden>
+            <section class="card">
+              <label class="field">
+                <span>当前密码</span>
+                <input type="password" id="secDecryptPassword" placeholder="输入打开密码" autocomplete="off" />
+              </label>
+              <p class="hint">解密后输出无密码保护的 PDF</p>
+            </section>
+          </div>
+
+          <div id="secMetaPanel" hidden>
+            <section class="card">
+              <label class="field">
+                <span>密码（加密 PDF 必填）</span>
+                <input type="password" id="secMetaPassword" placeholder="未加密可留空" autocomplete="off" />
+              </label>
+              <button type="button" class="btn" id="secRefreshMeta">查看元数据</button>
+              <section class="card result" id="secMetaInfo" hidden style="margin-top:0.85rem">
+                <h3>当前元数据</h3>
+                <ul id="secMetaList"></ul>
+              </section>
+              <p class="hint">将移除标题、作者、关键词、创建程序等隐私字段</p>
+            </section>
+          </div>
+
+          <button type="button" class="btn btn-block" id="secRun" disabled>开始处理</button>
+
+          <section class="card result" id="secResult" hidden>
+            <h3>结果</h3>
+            <ul id="secResultList"></ul>
+          </section>
+          <section class="card error" id="secError" hidden>
+            <h3>错误</h3>
+            <p id="secErrorText"></p>
+          </section>
+        </section>
+
+        <!-- 脱敏涂黑 -->
+        <section class="view view-wide" id="view-redact">
+          <div class="view-header">
+            <h2>脱敏涂黑</h2>
+            <p>在预览中框选敏感内容，输出带黑色遮盖的 PDF</p>
+          </div>
+
+          <section class="card drop-zone" id="redactDropZone">
+            <p class="drop-hint">拖放 PDF 到此处</p>
+            <p class="drop-sub">或点击下方按钮选择</p>
+          </section>
+
+          <section class="card">
+            <label class="field">
+              <span>源 PDF</span>
+              <div class="input-row">
+                <input type="text" id="redactSource" readonly placeholder="选择 PDF" />
+                <button type="button" class="btn" id="redactPickSource">选择</button>
+              </div>
+            </label>
+            <label class="field">
+              <span>输出 PDF</span>
+              <div class="input-row">
+                <input type="text" id="redactOutput" readonly placeholder="保存位置" />
+                <button type="button" class="btn" id="redactPickOutput">保存</button>
+              </div>
+            </label>
+            <label class="field">
+              <span>密码（加密 PDF）</span>
+              <input type="password" id="redactPassword" placeholder="未加密可留空" autocomplete="off" />
+            </label>
+            <p class="info-bar" id="redactFileSummary" hidden></p>
+          </section>
+
+          <section class="card preview-panel">
+            <div class="preview-toolbar">
+              <button type="button" class="btn" id="redactLoadPreview">加载预览</button>
+              <span id="redactPreviewSummary"></span>
+              <div class="preview-nav">
+                <button type="button" class="btn btn-secondary" id="redactPrevPage">上一页</button>
+                <span id="redactPageLabel">—</span>
+                <button type="button" class="btn btn-secondary" id="redactNextPage">下一页</button>
+              </div>
+            </div>
+            <p id="redactPreviewEmpty" class="preview-empty">选择 PDF 后点击「加载预览」，在页面上拖拽框选涂黑区域</p>
+            <div id="redactPreviewContent" hidden>
+              <p class="hint" id="redactRegionSummary">在预览上拖拽框选敏感区域</p>
+              <div class="preview-canvas-wrap redact-canvas-stack" id="redactCanvasWrap">
+                <canvas id="redactCanvas"></canvas>
+                <canvas id="redactOverlay" class="redact-overlay"></canvas>
+              </div>
+              <div class="input-row" style="margin-top:0.75rem">
+                <button type="button" class="btn btn-secondary" id="redactClearPage">清除当前页</button>
+                <button type="button" class="btn btn-secondary" id="redactClearAll">清除全部</button>
+              </div>
+              <ul class="redact-region-list" id="redactRegionList"></ul>
+            </div>
+          </section>
+
+          <p class="info-bar warn">注意：涂黑只是在页面内容之上叠加黑色矩形，底层文字仍可被选中、复制或被程序提取，并非真正的数据擦除。此功能仅用于视觉遮盖；如需彻底移除敏感文字，请先将页面转为图片再导出（见「格式转换」），或使用专业脱敏工具。清除元数据不会删除页面正文内容。</p>
+
+          <button type="button" class="btn btn-block" id="redactRun" disabled>应用涂黑</button>
+
+          <section class="card result" id="redactResult" hidden>
+            <h3>结果</h3>
+            <ul id="redactResultList"></ul>
+          </section>
+          <section class="card error" id="redactError" hidden>
+            <h3>错误</h3>
+            <p id="redactErrorText"></p>
+          </section>
+        </section>
+
+        <!-- 预览信息 -->
+        <section class="view view-wide" id="view-info">
+          <div class="view-header">
+            <h2>预览与信息</h2>
+            <p>PDF 预览、缩略图导航、元数据查看与编辑</p>
+          </div>
+
+          <div class="tabs">
+            <button type="button" class="tab active" data-info-mode="preview">预览</button>
+            <button type="button" class="tab" data-info-mode="meta">元数据</button>
+          </div>
+
+          <section class="card drop-zone" id="infoDropZone">
+            <p class="drop-hint">拖放 PDF 到此处</p>
+            <p class="drop-sub">或点击下方按钮选择</p>
+          </section>
+
+          <section class="card">
+            <label class="field">
+              <span>PDF 文件</span>
+              <div class="input-row">
+                <input type="text" id="infoSource" readonly placeholder="选择 PDF" />
+                <button type="button" class="btn" id="infoPickSource">选择</button>
+              </div>
+            </label>
+            <label class="field">
+              <span>密码（加密 PDF）</span>
+              <input type="password" id="infoPassword" placeholder="未加密可留空" autocomplete="off" />
+            </label>
+            <p class="info-bar" id="infoFileSummary" hidden></p>
+          </section>
+
+          <div id="infoPreviewPanel">
+            <section class="card preview-panel">
+              <div class="preview-toolbar">
+                <button type="button" class="btn" id="infoLoadPreview">加载预览</button>
+                <span id="infoPreviewSummary"></span>
+                <div class="preview-nav">
+                  <button type="button" class="btn btn-secondary" id="infoPrevPage">上一页</button>
+                  <span id="infoPageLabel">—</span>
+                  <button type="button" class="btn btn-secondary" id="infoNextPage">下一页</button>
+                  <input type="number" id="infoPageInput" min="1" value="1" aria-label="跳转到页码" style="width:4.5rem" />
+                  <button type="button" class="btn btn-secondary" id="infoGotoPage">跳转</button>
+                </div>
+              </div>
+              <p id="infoPreviewEmpty" class="preview-empty">选择 PDF 后点击「加载预览」</p>
+              <div id="infoPreviewContent" hidden>
+                <div class="preview-canvas-wrap" id="infoCanvasWrap">
+                  <canvas id="infoCanvas"></canvas>
+                </div>
+                <div class="thumb-strip" id="infoThumbStrip"></div>
+              </div>
+            </section>
+          </div>
+
+          <div id="infoMetaPanel" hidden>
+            <section class="card">
+              <label class="field">
+                <span>标题</span>
+                <input type="text" id="infoTitle" placeholder="文档标题" />
+              </label>
+              <label class="field">
+                <span>作者</span>
+                <input type="text" id="infoAuthor" placeholder="作者" />
+              </label>
+              <label class="field">
+                <span>主题</span>
+                <input type="text" id="infoSubject" placeholder="主题" />
+              </label>
+              <label class="field">
+                <span>关键词</span>
+                <input type="text" id="infoKeywords" placeholder="关键词，逗号分隔" />
+              </label>
+              <label class="field">
+                <span>输出 PDF</span>
+                <div class="input-row">
+                  <input type="text" id="infoOutput" readonly placeholder="保存位置" />
+                  <button type="button" class="btn" id="infoPickOutput">保存</button>
+                </div>
+              </label>
+              <p class="hint" id="infoMetaStatus"></p>
+              <div class="input-row" style="margin-top:0.5rem">
+                <button type="button" class="btn" id="infoRefreshMeta">刷新元数据</button>
+                <button type="button" class="btn" id="infoSaveMeta">保存元数据</button>
+              </div>
+            </section>
+          </div>
+
+          <section class="card result" id="infoResult" hidden>
+            <h3>结果</h3>
+            <ul id="infoResultList"></ul>
+          </section>
+          <section class="card error" id="infoError" hidden>
+            <h3>错误</h3>
+            <p id="infoErrorText"></p>
+          </section>
+        </section>
+
+        <!-- 页面工具 -->
+        <section class="view" id="view-pages">
+          <div class="view-header">
+            <h2>页面工具</h2>
+            <p>合并、拆分、重排、插入、裁剪、统一尺寸、去空白页</p>
+          </div>
+
+          <div class="tabs">
+            <button type="button" class="tab active" data-page-op="merge">合并</button>
+            <button type="button" class="tab" data-page-op="split">拆分</button>
+            <button type="button" class="tab" data-page-op="extract">提取</button>
+            <button type="button" class="tab" data-page-op="delete">删除</button>
+            <button type="button" class="tab" data-page-op="rotate">旋转</button>
+            <button type="button" class="tab" data-page-op="reorder">重排</button>
+            <button type="button" class="tab" data-page-op="insert">插入</button>
+            <button type="button" class="tab" data-page-op="crop">裁剪</button>
+            <button type="button" class="tab" data-page-op="resize">尺寸</button>
+            <button type="button" class="tab" data-page-op="blank">去空白</button>
+          </div>
+
+          <section class="card drop-zone" id="pagesDropZone">
+            <p class="drop-hint">拖放 PDF 到此处</p>
+            <p class="drop-sub">或点击下方按钮选择（合并模式可连续拖入多个）</p>
+          </section>
+
+          <div id="pagesInfoBar" class="info-bar" hidden></div>
+
+          <!-- 合并 -->
+          <div class="op-panel" data-op="merge">
+            <section class="card">
+              <label class="field">
+                <span>PDF 文件（<output id="mergeFileCount">0</output> 个，至少 2 个）</span>
+                <div class="input-row">
+                  <button type="button" class="btn" id="mergePickFiles">选择多个</button>
+                  <button type="button" class="btn btn-secondary" id="mergeClearFiles">清空</button>
+                </div>
+                <ul class="file-list" id="mergeFileList"></ul>
+              </label>
+              <label class="field">
+                <span>输出文件</span>
+                <div class="input-row">
+                  <input type="text" id="mergeOutput" readonly placeholder="合并后的 PDF" />
+                  <button type="button" class="btn" id="mergePickOutput">保存</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <!-- 拆分 -->
+          <div class="op-panel" data-op="split" hidden>
+            <section class="card">
+              <label class="field">
+                <span>源文件</span>
+                <div class="input-row">
+                  <input type="text" id="splitSource" readonly placeholder="选择 PDF" />
+                  <button type="button" class="btn" id="splitPickSource">选择</button>
+                </div>
+              </label>
+              <label class="field">
+                <span>拆分方式</span>
+                <select id="splitMode">
+                  <option value="ranges">按页码范围</option>
+                  <option value="every_n">每 N 页</option>
+                </select>
+              </label>
+              <label class="field" id="splitRangesField">
+                <span>页码范围</span>
+                <input type="text" id="splitRanges" placeholder="如 1-3;4-6;7-10" />
+                <p class="hint">用分号分隔多段，每段生成一个文件</p>
+              </label>
+              <label class="field" id="splitEveryField" hidden>
+                <span>每 N 页一个文件</span>
+                <input type="number" id="splitEvery" min="1" value="1" />
+              </label>
+              <label class="field">
+                <span>输出目录</span>
+                <div class="input-row">
+                  <input type="text" id="splitOutputDir" readonly placeholder="选择目录" />
+                  <button type="button" class="btn" id="splitPickOutputDir">选择</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <!-- 重排 -->
+          <div class="op-panel" data-op="reorder" hidden>
+            <section class="card">
+              <label class="field">
+                <span>源文件</span>
+                <div class="input-row">
+                  <input type="text" id="reorderSource" readonly placeholder="选择 PDF" />
+                  <button type="button" class="btn" id="reorderPickSource">选择</button>
+                </div>
+              </label>
+              <label class="field">
+                <span>新顺序（须列出全部页码）</span>
+                <input type="text" id="reorderOrder" placeholder="如 3,1,2,4（4 页文档）" />
+              </label>
+              <label class="field">
+                <span>输出文件</span>
+                <div class="input-row">
+                  <input type="text" id="reorderOutput" readonly placeholder="保存位置" />
+                  <button type="button" class="btn" id="reorderPickOutput">保存</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <!-- 插入 -->
+          <div class="op-panel" data-op="insert" hidden>
+            <section class="card">
+              <label class="field">
+                <span>目标 PDF</span>
+                <div class="input-row">
+                  <input type="text" id="insertTarget" readonly placeholder="被插入的 PDF" />
+                  <button type="button" class="btn" id="insertPickTarget">选择</button>
+                </div>
+              </label>
+              <label class="field">
+                <span>插入来源 PDF</span>
+                <div class="input-row">
+                  <input type="text" id="insertFrom" readonly placeholder="提供页面的 PDF" />
+                  <button type="button" class="btn" id="insertPickFrom">选择</button>
+                </div>
+              </label>
+              <label class="field">
+                <span>插入位置（1=最前，n+1=最后）</span>
+                <input type="number" id="insertPosition" min="1" value="1" />
+              </label>
+              <label class="field">
+                <span>插入页码（留空=全部）</span>
+                <input type="text" id="insertPages" placeholder="如 1-3 或留空" />
+              </label>
+              <label class="field">
+                <span>输出文件</span>
+                <div class="input-row">
+                  <input type="text" id="insertOutput" readonly placeholder="保存位置" />
+                  <button type="button" class="btn" id="insertPickOutput">保存</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <!-- 提取 / 删除 / 旋转 / 裁剪 / 尺寸 / 去空白 共用或扩展表单 -->
+          <div class="op-panel" data-op="extract" hidden>
+            <section class="card">
+              <label class="field">
+                <span>源文件</span>
+                <div class="input-row">
+                  <input type="text" id="pagesSource" readonly placeholder="选择 PDF" />
+                  <button type="button" class="btn" id="pagesPickSource">选择</button>
+                </div>
+              </label>
+              <label class="field" id="pagesRangeField">
+                <span id="pagesRangeLabel">页码</span>
+                <input type="text" id="pagesRange" placeholder="如 1-5, 8, 10-12" />
+                <p class="hint" id="pagesRangeHint"></p>
+              </label>
+              <label class="field" id="rotateDegreesField" hidden>
+                <span>旋转角度</span>
+                <select id="rotateDegrees">
+                  <option value="90">顺时针 90°</option>
+                  <option value="180">180°</option>
+                  <option value="270">顺时针 270°</option>
+                </select>
+              </label>
+              <label class="field" id="cropMarginField" hidden>
+                <span>裁剪边距（pt）</span>
+                <input type="number" id="cropMargin" min="1" value="36" />
+                <p class="hint">四边统一裁切，单位：磅（1 磅 ≈ 0.35 毫米）</p>
+              </label>
+              <label class="field" id="resizeSizeField" hidden>
+                <span>目标尺寸</span>
+                <select id="resizeSize">
+                  <option value="a4">A4（595×842 pt）</option>
+                  <option value="letter">Letter（612×792 pt）</option>
+                </select>
+                <p class="hint">统一页面尺寸，不改变内容缩放</p>
+              </label>
+              <label class="field" id="pagesOutputField">
+                <span>输出文件</span>
+                <div class="input-row">
+                  <input type="text" id="pagesOutput" readonly placeholder="保存位置" />
+                  <button type="button" class="btn" id="pagesPickOutput">保存</button>
+                </div>
+              </label>
+            </section>
+          </div>
+
+          <button type="button" class="btn btn-block" id="pagesRun" disabled>开始处理</button>
+
+          <section class="card result" id="pagesResult" hidden>
+            <h3>结果</h3>
+            <ul id="pagesResultList"></ul>
+          </section>
+          <section class="card error" id="pagesError" hidden>
+            <h3>错误</h3>
+            <p id="pagesErrorText"></p>
+          </section>
+        </section>
+
+        <!-- 关于 -->
+        <section class="view" id="view-about">
+          <div class="view-header">
+            <h2>关于</h2>
+            <p>版本信息、作者与使用引导</p>
+          </div>
+
+          <div class="free-banner">
+            <span class="free-banner-icon" aria-hidden="true">✓</span>
+            <div>
+              <strong>当前版本免费使用</strong>
+              <p>依据 MIT 开源许可提供，文件全程本地处理。具体条款见「许可证」。</p>
+            </div>
+          </div>
+
+          <section class="card about-card">
+            <h3 class="card-section-title">ⓘ 关于</h3>
+            <div class="about-brand">
+              <img src="/inkdot.png?v=1" alt="墨点 inkdot 网站 Logo" class="about-logo" width="56" height="56" />
+              <div>
+                <div class="about-brand-name">墨点 inkdot</div>
+                <div class="about-brand-tagline">小工具，一点就够用 · inkdot.cn</div>
+              </div>
+            </div>
+            <dl class="meta-table">
+              <div class="meta-row">
+                <dt>应用名称</dt>
+                <dd>PDF 工具箱 <span class="badge badge-free">免费</span></dd>
+              </div>
+              <div class="meta-row">
+                <dt>版本</dt>
+                <dd data-app-version>1.0.0</dd>
+              </div>
+              <div class="meta-row">
+                <dt>品牌</dt>
+                <dd>墨点（inkdot）</dd>
+              </div>
+              <div class="meta-row">
+                <dt>作者</dt>
+                <dd>inkdot</dd>
+              </div>
+              <div class="meta-row">
+                <dt>网址</dt>
+                <dd><a class="ext-link" href="https://inkdot.cn" target="_blank" rel="noopener noreferrer">🔗 inkdot.cn</a></dd>
+              </div>
+              <div class="meta-row">
+                <dt>许可</dt>
+                <dd>MIT 开源许可（中文），详见 <button type="button" class="link-btn" data-goto="license">「许可证」</button></dd>
+              </div>
+              <div class="meta-row">
+                <dt>定位</dt>
+                <dd>离线桌面 PDF 多功能工具箱</dd>
+              </div>
+            </dl>
+          </section>
+        </section>
+
+        <!-- 许可证 -->
+        <section class="view" id="view-license">
+          <div class="view-header">
+            <h2>许可证</h2>
+            <p>软件使用条款与开源许可</p>
+          </div>
+
+          <div class="free-banner">
+            <span class="free-banner-icon" aria-hidden="true">✓</span>
+            <div>
+              <strong>开源免费</strong>
+              <p>PDF 工具箱依据 MIT 开源许可发布，允许个人与商业使用，具体以 MIT 许可条款为准。</p>
+            </div>
+          </div>
+
+          <section class="card license-card">
+            <h3 class="card-section-title">软件许可协议</h3>
+            <p class="license-intro">PDF 工具箱由墨点（inkdot）发布，采用 MIT 开源许可。以下为中文说明，便于阅读与理解。</p>
+            <pre class="license-text">墨点（inkdot）软件许可协议
+
+版权所有 © inkdot
+
+特此免费授予任何获得本软件及其相关文档文件（以下简称「软件」）副本的人，
+不受限制地处理本软件，包括但不限于使用、复制、修改、合并、发布、分发、
+再许可和/或出售本软件副本的权利，并允许向其提供本软件的人这样做，
+但须符合以下条件：
+
+上述版权声明和本许可声明应包含在本软件的所有副本或重要部分中。
+
+本软件按「原样」提供，不提供任何形式的明示或暗示担保，包括但不限于
+对适销性、特定用途适用性和非侵权性的担保。在任何情况下，作者或版权
+持有人均不对任何索赔、损害或其他责任负责，无论是在合同诉讼、侵权行为
+还是其他方面，由软件或软件的使用或其他交易引起、产生或与之有关。</pre>
+          </section>
+
+          <section class="card">
+            <h3 class="card-section-title">第三方组件</h3>
+            <p class="hint">本软件使用以下开源组件（节选）：Tauri、lopdf、PDF.js、Vite 等。各组件遵循其各自的开源许可证。</p>
+          </section>
+        </section>
+      </main>
+    </div>
+    </div>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+    <div class="result-dialog-backdrop" id="resultDialog" hidden>
+      <div class="result-dialog" role="dialog" aria-modal="true" aria-labelledby="resultDialogTitle">
+        <div class="result-dialog-icon" aria-hidden="true">✓</div>
+        <h3 class="result-dialog-title" id="resultDialogTitle">处理完成</h3>
+        <p class="result-dialog-message" id="resultDialogMessage"></p>
+        <div class="result-dialog-path" id="resultDialogPathWrap" hidden>
+          <span class="result-dialog-path-label">输出</span>
+          <code class="result-dialog-path-text" id="resultDialogPath" title=""></code>
+        </div>
+        <div class="result-dialog-details" id="resultDialogDetails" hidden></div>
+        <div class="result-dialog-actions">
+          <button type="button" class="btn btn-secondary" id="resultDialogReveal" hidden>打开文件位置</button>
+          <button type="button" class="btn btn-secondary" id="resultDialogCopy" hidden>复制路径</button>
+          <button type="button" class="btn" id="resultDialogOk">知道了</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay" hidden>
+      <div class="spinner"></div>
+      <p id="loadingText">处理中…</p>
+      <div class="progress-track loading-progress" id="loadingProgress" hidden>
+        <div class="progress-bar" id="loadingProgressBar"></div>
+      </div>
+      <p class="progress-label" id="loadingPercent" hidden>0%</p>
+    </div>
+
+    <script type="module" src="/js/app.js"></script>
+  </body>
+</html>
