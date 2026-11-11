@@ -93,8 +93,9 @@ jobs:
         with:
           name: macos-apple-silicon
           path: |
-            src-tauri/target/release/bundle/dmg/*.dmg
-            src-tauri/target/release/bundle/macos/*.app
+            src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+            src-tauri/target/aarch64-apple-darwin/release/bundle/macos/*.app
+          if-no-files-found: error
           retention-days: 7
 
   # 可选：如需 Intel Mac 版，取消本 job 注释（会额外消耗 macOS 10× 额度）
@@ -115,8 +116,9 @@ jobs:
   #       with:
   #         name: macos-intel
   #         path: |
-  #           src-tauri/target/release/bundle/dmg/*.dmg
-  #           src-tauri/target/release/bundle/macos/*.app
+  #           src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
+  #           src-tauri/target/x86_64-apple-darwin/release/bundle/macos/*.app
+  #         if-no-files-found: error
   #         retention-days: 7
 
   release:
