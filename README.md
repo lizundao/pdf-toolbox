@@ -44,6 +44,18 @@ npm run release:zip       # 仅打 zip（需先 release）
 - **便携版**：`release/PDF工具箱-1.0.0-便携版.zip`（含 exe + 用户手册）
 - 安装程序：`src-tauri/target/release/bundle/nsis/PDF Toolbox_1.0.0_x64-setup.exe`
 
+## 下载（v1.0.0）
+
+从 [GitHub Releases](https://github.com/lizundao/pdf-toolbox/releases) 获取：
+
+| 平台 | 文件 | 说明 |
+|------|------|------|
+| Windows | `PDF-Toolbox-1.0.0-setup-win-x64.exe` | 安装版，当前用户安装，免管理员权限 |
+| Windows | `PDF-Toolbox-1.0.0-portable-win-x64.zip` | 绿色版，解压即用，不写注册表 |
+| macOS | `PDF-Toolbox-1.0.0-aarch64.dmg` | Apple Silicon（未签名，见审核报告） |
+
+> 未签名程序首次运行会触发 Windows SmartScreen / macOS Gatekeeper 提示，处理方式见 [发布说明](docs/发布说明.md)。
+
 用户文档 [docs/用户手册.md](docs/用户手册.md) · 发布说明 [docs/发布说明.md](docs/发布说明.md)
 
 ## 项目结构
