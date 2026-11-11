@@ -1,10 +1,15 @@
 use crate::convert::ConvertResult;
-use crate::progress::emit_progress;
-use std::path::Path;
-use std::process::{Command, Output};
-use std::sync::Mutex;
-use std::time::{Duration, Instant};
 use tauri::AppHandle;
+#[cfg(windows)]
+use crate::progress::emit_progress;
+#[cfg(windows)]
+use std::path::Path;
+#[cfg(windows)]
+use std::process::{Command, Output};
+#[cfg(windows)]
+use std::sync::Mutex;
+#[cfg(windows)]
+use std::time::{Duration, Instant};
 
 #[derive(Clone, serde::Serialize)]
 pub struct OfficeStatus {
@@ -15,6 +20,7 @@ pub struct OfficeStatus {
     pub powerpoint: bool,
 }
 
+#[cfg(windows)]
 #[derive(Copy, Clone)]
 enum OfficeKind {
     Word,
@@ -22,6 +28,7 @@ enum OfficeKind {
     PowerPoint,
 }
 
+#[cfg(windows)]
 impl OfficeKind {
     fn app_name(self) -> &'static str {
         match self {
@@ -39,6 +46,9 @@ impl OfficeKind {
         }
     }
 
+    // 三个 BODY 常量仅在 Windows 下定义（依赖 PowerShell COM），
+    // 故本方法同样只在 Windows 编译，避免 macOS/Linux 交叉编译时报 E0425。
+    #[cfg(windows)]
     fn body(self) -> &'static str {
         match self {
             Self::Word => WORD_BODY,
@@ -48,14 +58,18 @@ impl OfficeKind {
     }
 }
 
+#[cfg(windows)]
 struct OfficeCache {
     status: OfficeStatus,
     at: Instant,
 }
 
+#[cfg(windows)]
 static OFFICE_CACHE: Mutex<Option<OfficeCache>> = Mutex::new(None);
+#[cfg(windows)]
 const CACHE_TTL: Duration = Duration::from_secs(300);
 
+#[cfg(windows)]
 fn kind_from_path(path: &Path) -> Option<OfficeKind> {
     let ext = path.extension()?.to_str()?.to_lowercase();
     match ext.as_str() {
